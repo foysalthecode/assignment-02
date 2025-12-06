@@ -2,8 +2,8 @@ import express, { Request, Response } from "express";
 import initDB from "./database/db";
 import config from "./database/config";
 import { vehiclesRoutes } from "./modules/vehicles/vehicles.routes";
-import { customerRoutes } from "./modules/customers/user.routes";
-import { userRegRoutes } from "./modules/customerRegistration/userReg.routes";
+import { usersRoutes } from "./modules/users/user.routes";
+import { userRegRoutes } from "./modules/userRegistration/userReg.routes";
 const app = express();
 
 app.use(express.json());
@@ -13,9 +13,9 @@ initDB();
 
 app.use("/api/v1/vehicles", vehiclesRoutes); //* vehicles
 
-app.use("/api/v1/auth", userRegRoutes); //* Customer Registration
+app.use("/api/v1/auth", userRegRoutes); //* user Registration
 
-// app.use("/api/v1/users", customerRoutes); //* Customers
+app.use("/api/v1/users", usersRoutes); //* users
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Vehicle Rental System Backed");

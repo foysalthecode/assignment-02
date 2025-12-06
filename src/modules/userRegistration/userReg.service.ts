@@ -41,7 +41,6 @@ const loginUser = async (email: string, password: string) => {
   delete user.password;
   return { token, user };
 };
-
 export const userRegService = {
   createUser,
   loginUser,
