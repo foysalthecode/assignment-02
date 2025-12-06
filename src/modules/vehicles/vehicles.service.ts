@@ -61,6 +61,7 @@ const deleteVehicle = async (id: string) => {
     `,
     [id]
   );
+  return result;
 };
 
 export const vehicleService = {
