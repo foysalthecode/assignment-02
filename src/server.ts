@@ -16,6 +16,14 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Vehicle Rental System Backed");
 });
 
+app.use("/", (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route Not Found",
+    path: req.path,
+  });
+});
+
 app.listen(config.port, () => {
   console.log(`Server is running on port ${config.port}`);
 });
