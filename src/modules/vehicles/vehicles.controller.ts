@@ -107,6 +107,15 @@ const updateVehicle = async (req: Request, res: Response) => {
 
 const deleteVehicle = async (req: Request, res: Response) => {
   try {
+    const isBookingExist = await vehicleService.isBookingExist(
+      req.params.vehicleId as string
+    );
+    if (isBookingExist) {
+      return res.status(400).json({
+        succes: false,
+        message: "This vehicle is Booked",
+      });
+    }
     const result = await vehicleService.deleteVehicle(
       req.params.vehicleId as string
     );

@@ -65,6 +65,17 @@ const updateVehicle = async (payload: Record<string, unknown>) => {
   return result;
 };
 
+const isBookingExist = async (id: string) => {
+  const bookingInfo = await pool.query(`
+    SELECT vehicle_id FROM bookings 
+    `);
+  const userBookingId = bookingInfo.rows.map((booking) =>
+    booking.vehicle_id.toString()
+  );
+  const isBookingExist = userBookingId.includes(id);
+  return isBookingExist;
+};
+
 const deleteVehicle = async (id: string) => {
   const result = await pool.query(
     `
@@ -81,4 +92,5 @@ export const vehicleService = {
   getSingleVehicle,
   updateVehicle,
   deleteVehicle,
+  isBookingExist,
 };

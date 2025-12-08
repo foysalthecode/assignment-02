@@ -18,6 +18,17 @@ const updateUser = async (payload: Record<string, unknown>) => {
   return result;
 };
 
+const isBookingExist = async (id: string) => {
+  const bookingInfo = await pool.query(`
+    SELECT customer_id FROM bookings 
+    `);
+  const userBookingId = bookingInfo.rows.map((booking) =>
+    booking.customer_id.toString()
+  );
+  const isBookingExist = userBookingId.includes(id);
+  return isBookingExist;
+};
+
 const deleteUser = async (id: string) => {
   const result = await pool.query(
     `
@@ -32,4 +43,5 @@ export const userService = {
   getAlluser,
   updateUser,
   deleteUser,
+  isBookingExist,
 };
