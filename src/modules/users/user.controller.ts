@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { userService } from "./user.service";
+import { JwtPayload } from "jsonwebtoken";
 
 const getAlluser = async (req: Request, res: Response) => {
   try {
@@ -18,17 +19,33 @@ const getAlluser = async (req: Request, res: Response) => {
 };
 
 const updateUser = async (req: Request, res: Response) => {
-  const { name, email, phone, role } = req.body;
-  const id = req.params.userId;
-  const payload = { name, email, phone, role, id };
+  // const { name, email, phone, role } = req?.body;
+  const id = req.params.userId as string;
+  const payload = {
+    name: req.body?.name,
+    email: req.body?.email,
+    phone: req.body?.phone,
+    role: req.body?.role,
+    id,
+  };
+  const user = req.user as JwtPayload;
+  const userRole = req.user?.role;
+  const matchProfile = await userService.checkOwnProfile(id, user);
   try {
-    const result = await userService.updateUser(payload);
-    delete result.rows[0].password;
-    return res.status(200).json({
-      succes: true,
-      message: "User updated successfully",
-      data: result.rows[0],
-    });
+    if (userRole === "admin" || matchProfile) {
+      const result = await userService.updateUser(payload);
+      delete result.rows[0].password;
+      return res.status(200).json({
+        succes: true,
+        message: "User updated successfully",
+        data: result.rows[0],
+      });
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: "You're not authorized",
+      });
+    }
   } catch (err: any) {
     return res.status(500).json({
       success: false,

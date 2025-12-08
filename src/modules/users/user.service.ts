@@ -1,3 +1,4 @@
+import { JwtPayload } from "jsonwebtoken";
 import { pool } from "../../database/db";
 
 const getAlluser = async () => {
@@ -5,6 +6,18 @@ const getAlluser = async () => {
         SELECT id,name,role,email,phone FROM users
         `);
   return result;
+};
+
+const checkOwnProfile = async (id: string, user: JwtPayload) => {
+  const email = user?.email;
+  const result = await pool.query(
+    `
+    SELECT email FROM users WHERE id=$1
+    `,
+    [id]
+  );
+  const matchProfile = result.rows[0]?.email === email;
+  return matchProfile;
 };
 
 const updateUser = async (payload: Record<string, unknown>) => {
@@ -44,4 +57,5 @@ export const userService = {
   updateUser,
   deleteUser,
   isBookingExist,
+  checkOwnProfile,
 };
