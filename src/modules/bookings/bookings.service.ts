@@ -68,7 +68,7 @@ const getAllBooking = async () => {
         `);
   const customerInfo = await pool.query(
     `
-    SELECT name,email FROM users WHERE id=$1
+    SELECT id,name,email FROM users WHERE id=$1
     `,
     [result.rows[0].customer_id]
   );
@@ -78,11 +78,35 @@ const getAllBooking = async () => {
     `,
     [result.rows[0].vehicle_id]
   );
-  // const { name, email } = customerInfo.rows[0];
-  // const { vehicle_name, registration_number } = vehicleInfo.rows[0];
-  // const customerinfo = { name, email };
-  // const vehicleinfo = { vehicle_name, registration_number };
   return { result, customerInfo, vehicleInfo };
+};
+
+const singleCustomerBooking = async (email: string) => {
+  const bookingInfo = await pool.query(`
+        SELECT * FROM bookings
+        `);
+  const customerInfo = await pool.query(
+    `
+    SELECT id,name,email FROM users WHERE email=$1
+    `,
+    [email]
+  );
+  const ownBooking = bookingInfo.rows.filter(
+    (booking) => booking.customer_id === customerInfo.rows[0].id
+  );
+
+  const ownBookingVehicleId = ownBooking.map((booking) => booking.vehicle_id);
+  const vehicleId = ownBooking.map((vehicleid) => vehicleid.vehicle_id);
+  // const vehicleInfo = await pool.query(
+  //   `
+  //   SELECT * FROM vehicles WHERE id=$1
+  //   `,
+  //   [bookingInfo.rows[0].vehicle_id]
+  // );
+
+  //vehicle_name, registration_number
+
+  return ownBooking;
 };
 
 const updateBooking = async (status: string, id: string) => {
@@ -102,9 +126,15 @@ const updateBooking = async (status: string, id: string) => {
     `,
     [booked, vehicle_id as string]
   );
-  console.log("result from service", vehicle_id);
 
-  return result;
+  const vehicleInfo = await pool.query(
+    `
+    SELECT availability_status FROM vehicles WHERE id=$1
+    `,
+    [vehicle_id]
+  );
+
+  return { result, vehicleInfo };
 };
 
 export const bookingService = {
@@ -112,4 +142,5 @@ export const bookingService = {
   getAllBooking,
   updateBooking,
   isVehicleAndUserExistForBook,
+  singleCustomerBooking,
 };

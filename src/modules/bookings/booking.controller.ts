@@ -36,18 +36,28 @@ const createBooking = async (req: Request, res: Response) => {
 
 const getAllBooking = async (req: Request, res: Response) => {
   try {
+    const email = req.user?.email as string;
+    const ownBooking = await bookingService.singleCustomerBooking(email);
     const { result, customerInfo, vehicleInfo } =
       await bookingService.getAllBooking();
     const { role } = req.user as JwtPayload;
     const mainResult = result.rows;
+    const customer = customerInfo.rows;
+    const vehicle = vehicleInfo.rows;
     if (role === "admin") {
       return res.status(201).json({
         success: true,
         message: "Booking retrieved successfully",
-        data: { mainResult, customerInfo, vehicleInfo },
+        data: { mainResult, customer, vehicle },
         // data: result.rows,
       });
     } else if (role === "customer") {
+      return res.status(200).json({
+        success: true,
+        message: "Booking retrieved successfully",
+        data: ownBooking,
+        vehicle,
+      });
     }
   } catch (err: any) {
     return res.status(400).json({
@@ -61,13 +71,17 @@ const updateBooking = async (req: Request, res: Response) => {
   const { role } = req.user as JwtPayload;
   const id = req.params.bookingId as string;
   try {
-    const result = await bookingService.updateBooking(req.body.status, id);
+    const { result, vehicleInfo } = await bookingService.updateBooking(
+      req.body.status,
+      id
+    );
+    const vehicle = vehicleInfo.rows[0];
     if (role === "admin" && req.body.status === "returned") {
-      console.log(result);
       return res.status(200).json({
         success: true,
         message: "Booking marked as returned. Vehicle is now available",
         data: result.rows[0],
+        vehicle,
       });
     } else if (role === "customer" && req.body.status === "cancelled") {
       return res.status(200).json({
