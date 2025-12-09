@@ -4,7 +4,7 @@ import auth from "../../middleware/auth";
 
 const router = Router();
 
-router.post("/", bookingController.createBooking);
+router.post("/", auth("admin", "customer"), bookingController.createBooking);
 
 router.get("/", auth("admin", "customer"), bookingController.getAllBooking);
 

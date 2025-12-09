@@ -4,14 +4,28 @@ import { JwtPayload } from "jsonwebtoken";
 
 const createBooking = async (req: Request, res: Response) => {
   try {
-    const { result, vehicle } = await bookingService.createBooking(req.body);
-    const resultt = result.rows[0];
-    return res.status(201).json({
-      success: true,
-      message: "Booking created successfully",
-      data: resultt,
-      vehicle,
-    });
+    const { usersResult, vehicleResult } =
+      await bookingService.isVehicleAndUserExistForBook(req.body);
+    if (usersResult.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: "User Not Found",
+      });
+    } else if (vehicleResult.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: "Vehicle Not Found",
+      });
+    } else {
+      const { result, vehicle } = await bookingService.createBooking(req.body);
+      const resultt = result.rows[0];
+      return res.status(201).json({
+        success: true,
+        message: "Booking created successfully",
+        data: resultt,
+        vehicle,
+      });
+    }
   } catch (err: any) {
     return res.status(400).json({
       success: false,

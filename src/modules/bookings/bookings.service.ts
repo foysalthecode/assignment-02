@@ -1,5 +1,25 @@
 import { pool } from "../../database/db";
 
+const isVehicleAndUserExistForBook = async (
+  payload: Record<string, unknown>
+) => {
+  const { customer_id, vehicle_id } = payload;
+  const usersResult = await pool.query(
+    `
+    SELECT * FROM users WHERE id = $1
+    `,
+    [customer_id]
+  );
+  const vehicleResult = await pool.query(
+    `
+    SELECT * FROM vehicles WHERE id = $1
+    `,
+    [vehicle_id]
+  );
+
+  return { usersResult, vehicleResult };
+};
+
 const createBooking = async (payload: Record<string, unknown>) => {
   const { customer_id, vehicle_id, rent_start_date, rent_end_date } = payload;
   const booked = "booked";
@@ -10,12 +30,7 @@ const createBooking = async (payload: Record<string, unknown>) => {
     `,
     [vehicle_id]
   );
-  const upateVehicleStatus = await pool.query(
-    `
-    UPDATE vehicles SET availability_status=$1 WHERE id = $2
-    `,
-    [booked, vehicle_id]
-  );
+
   const carRentPrice = vehicleResult.rows[0].daily_rent_price;
   const startDate = new Date(rent_start_date as string);
   const endDate = new Date(rent_end_date as string);
@@ -35,6 +50,12 @@ const createBooking = async (payload: Record<string, unknown>) => {
       total_price,
       status,
     ]
+  );
+  const upateVehicleStatus = await pool.query(
+    `
+    UPDATE vehicles SET availability_status=$1 WHERE id = $2
+    `,
+    [booked, vehicle_id]
   );
   const { vehicle_name, daily_rent_price } = vehicleResult.rows[0];
   const vehicle = { vehicle_name, daily_rent_price };
@@ -90,4 +111,5 @@ export const bookingService = {
   createBooking,
   getAllBooking,
   updateBooking,
+  isVehicleAndUserExistForBook,
 };

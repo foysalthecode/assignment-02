@@ -65,7 +65,7 @@ const deleteUser = async (req: Request, res: Response) => {
         message: "User has Active vehicle Booking",
       });
     }
-    const result = await userService.deleteUser(req.params.userId as string);
+    // const result = await userService.deleteUser(req.params.userId as string);
     if (result.rowCount === 0) {
       res.status(404).json({
         success: false,
