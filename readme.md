@@ -26,6 +26,8 @@
     -> POST /api/v1/vehicles (for post vehicles)
     -> GET /api/v1/vehicles (get all vehicles)
 
-## Check 📝
-    -> GitHub Repo: https://github.com/foysalthecode/assignment-02
-    -> Live Deployment: https://vehicle-rental-system-umber.vercel.app
+## Check📝
+
+# GitHub Repo: https://github.com/foysalthecode/assignment-02
+
+# Live Deployment: https://vehicle-rental-system-umber.vercel.app
